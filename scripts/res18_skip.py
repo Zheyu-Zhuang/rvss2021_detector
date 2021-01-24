@@ -11,7 +11,7 @@ class Resnet18Skip(nn.Module):
         self.args = args
         super(Resnet18Skip, self).__init__()
         # Load pre-trained lyrn_backend
-        pre_trained_backbone = models.resnet18(pretrained=True)
+        pre_trained_backbone = models.resnet18(pretrained=False)
         # with torch.no_grad():
         self.resnet_backbone = nn.Sequential(*list(
             pre_trained_backbone.children())[:-6])
