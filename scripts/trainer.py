@@ -135,10 +135,12 @@ class Trainer:
         ckpt_path = os.path.join(self.args.model_dir, ckpt_name)
         with open(ckpt_path, 'wb') as f:
             torch.save(ckpt, f)
+        f.close()
         if self.loss_reduction > 0:
             best_ckpt_name = 'model.best.pth'
-            with open(best_ckpt_name, 'wb') as f:
-                torch.save(ckpt, f)
+            best_ckpt_path = os.path.join(self.args.model_dir, best_ckpt_name)
+            with open(best_ckpt_path, 'wb') as best_f:
+                torch.save(ckpt, best_f)
             if self.current_epoch > 0:
                 print(
                     f'=> Best Model Updated, {self.loss_reduction:.3f} ' + \
