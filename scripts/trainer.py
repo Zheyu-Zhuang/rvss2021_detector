@@ -148,32 +148,6 @@ class Trainer:
         else:
             print('=> Model Saved\n')
 
-    def save_ckpt(self, model, optimiser, lr_scheduler=None):
-        weights = model.state_dict()
-        ckpt = {'last_epoch': self.current_epoch,
-                'weights': weights,
-                'optimiser': optimiser.state_dict(),
-                'lowest_loss': self.lowest_loss
-                }
-        if optimiser is not None:
-            ckpt['lr_scheduler'] = lr_scheduler.state_dict()
-        ckpt_name = 'model.pth'
-        ckpt_path = os.path.join(self.args.model_dir, ckpt_name)
-        with open(ckpt_path, 'wb') as f:
-            torch.save(ckpt, f)
-        if self.loss_reduction > 0:
-            best_ckpt_name = 'model.best.pth'
-            with open(best_ckpt_name, 'wb') as f:
-                torch.save(ckpt, f)
-            if self.current_epoch > 0:
-                print(
-                    f'=> Best Model Updated, {self.loss_reduction:.3f} ' + \
-                    'Eval Loss Reduction\n')
-            else:
-                print('\n')
-        else:
-            print('=> Model Saved\n')
-
     def log(self, item):
         with open(os.path.join(self.args.model_dir, 'log.txt'), 'a') as log_file:
             log_file.write(item)
