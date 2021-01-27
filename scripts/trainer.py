@@ -98,7 +98,7 @@ class Trainer:
                     progress_bar = f'{(100.0*(batch_idx+1))/n_batches:02.2f}%'
                     elapsed_time = f'{time.time()-start_time:.2f}s'
                     est_finish = f'{(n_batches - batch_idx)*(time.time()-tick):.2f}s'
-                    print(f'[Evaluation] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]', end='\r')
+                    print(f'[Evaluation] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]')
         loss_eval = np.mean(loss_buff)
         return loss_eval
 
