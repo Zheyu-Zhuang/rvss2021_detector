@@ -137,6 +137,7 @@ class Trainer:
         if self.loss_reduction > 0:
             best_ckpt_name = 'model.best.pth'
             best_ckpt_path = os.path.join(self.args.model_dir, best_ckpt_name)
+            ckpt = {'weights': weights}
             with open(best_ckpt_path, 'wb') as best_f:
                 torch.save(ckpt, best_f)
             if self.current_epoch > 0:

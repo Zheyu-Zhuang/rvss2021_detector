@@ -1,7 +1,4 @@
-from res18_skip import Resnet18Skip
-from args import args
 import os 
-import torch
 import time
 
 import cmd_printer
@@ -79,8 +76,8 @@ class Detector:
                               map_location=lambda storage, loc: storage)
             self.model.load_state_dict(ckpt['weights'])
         else:
-            raise Exception('checkpoint not found, existing...')
-
+            print(f'checkpoint not found, weights are randomly initialised')
+            
     @staticmethod
     def np_img2torch(np_img, use_gpu=False, _size=(192, 256)):
         preprocess = transforms.Compose([transforms.ToPILImage(),

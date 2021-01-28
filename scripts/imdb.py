@@ -9,6 +9,8 @@ from PIL import Image
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from torchvision import transforms
+import torchvision.transforms.functional as TF
+import random
 
 
 class IMDB(Dataset):
@@ -17,8 +19,8 @@ class IMDB(Dataset):
         self.root_dir = root_dir
         self.transform = transforms.Compose(
             [
-#             transforms.ColorJitter(brightness=0.4, contrast=0.2,
-#                                     saturation=0.4, hue=0.05),
+            transforms.ColorJitter(brightness=0.4, contrast=0.2,
+                                    saturation=0.4, hue=0.05),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                 std=[0.229, 0.224, 0.225])]
@@ -48,6 +50,10 @@ class IMDB(Dataset):
         reduction = 2
         label = label.resize((int(width/reduction),
                               int(height/reduction)), Image.NEAREST)
+        angle = random.randint(-45, 45)
+        if random.random() > 0.5:
+            image = TF.rotate(image, angle)
+            label = TF.rotate(label, angle)
         if self.transform:
             image = self.transform(image)
         return image, np.array(label).astype(np.long)
