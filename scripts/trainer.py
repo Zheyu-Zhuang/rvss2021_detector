@@ -18,7 +18,6 @@ class Trainer:
         self.loss_reduction = 0
         self.last_epoch = -1
         self.current_epoch = None
-        # self.gpu_count = torch.cuda.device_count()
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
         print(f'\n=> The device is using {torch.cuda.device_count()} GPU(s).')
@@ -55,15 +54,14 @@ class Trainer:
                 loss.backward()
                 optimiser.step()
                 loss_buff.append(loss.item())
-                loss_str=f'Loss: {loss.item():.4f}'
-                progress_bar = f'{(100.0*(batch_idx+1))/n_batches:02.2f}%'
-                elapsed_time = f'{time.time()-start_time:.2f}s'
-                est_finish = f'{(n_batches - batch_idx)*(time.time()-tick):.2f}s'
-                print(f'[{epoch_str}] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]', end='\r')
                 if batch_idx % self.args.log_freq == 0:
+                    loss_str=f'Loss: {loss.item():.4f}'
+                    progress_bar = f'{(100.0*(batch_idx+1))/n_batches:02.2f}%'
+                    elapsed_time = f'{time.time()-start_time:.2f}s'
+                    est_finish = f'{(n_batches - batch_idx)*(time.time()-tick):.2f}s'
+                    print(f'\n[{epoch_str}] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]')
                     self.log(
                         f'\n[{batch_idx}/{n_batches}]: {loss.item():.4f}')
-            print(f'[{epoch_str}] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]')
             avg_train_loss = np.mean(loss_buff)
             loss_eval = self.evaluate(model, eval_loader)
             #
@@ -79,7 +77,7 @@ class Trainer:
             self.log('\n')
             # output to terminal
             print(
-                f'=> Training Loss: {avg_train_loss:.4f} , ' + \
+                f'\n=> Training Loss: {avg_train_loss:.4f} , ' + \
                 f'Evaluation Loss {loss_eval:.4f}')
             self.save_ckpt(model, optimiser, lr_scheduler)
 
@@ -95,12 +93,12 @@ class Trainer:
                 batch = [x.to(self.device) for x in batch]
                 loss_eval_temp = model.step(batch)
                 loss_buff.append(loss_eval_temp.item())
-                loss_str=f'Loss: {loss_eval_temp.item():.4f}'
-                progress_bar = f'{(100.0*(batch_idx+1))/n_batches:02.2f}%'
-                elapsed_time = f'{time.time()-start_time:.2f}s'
-                est_finish = f'{(n_batches - batch_idx)*(time.time()-tick):.2f}s'
-                print(f'[Evaluation] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]', end='\r')
-            print(f'[Evaluation] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]')
+                if batch_idx % self.args.log_freq == 0:
+                    loss_str=f'Loss: {loss_eval_temp.item():.4f}'
+                    progress_bar = f'{(100.0*(batch_idx+1))/n_batches:02.2f}%'
+                    elapsed_time = f'{time.time()-start_time:.2f}s'
+                    est_finish = f'{(n_batches - batch_idx)*(time.time()-tick):.2f}s'
+                    print(f'[Evaluation] {loss_str} [{progress_bar}, {elapsed_time} < {est_finish}]')
         loss_eval = np.mean(loss_buff)
         return loss_eval
 

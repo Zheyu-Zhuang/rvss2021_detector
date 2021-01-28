@@ -4,16 +4,21 @@ This is a light-weight fully convolutional network that infers at approximatly 3
 
 Current input resolution is set to 256x192, the segmentation mask is a quater of the input, i.e. 128x96
 ## Before you start
-Dependencies
-- pytorch 1.6 +
-- tqdm
-
-[TODO: create a new env and test what dependencies are required]
+```
+$ cd rvss2021_detector
+$ conda env create -f conda_env_win.yml (For Windows users)
+$ conda env create -f conda_env_mac.yml (For Mac users)
+$ conda env create -f conda_env_linux.yml (For Linux users)
+$ conda activate rvss21
+```
 
 ## Test the network
-1. [Download the network pre-trained weights here](https://anu365-my.sharepoint.com/:u:/g/personal/u5240496_anu_edu_au/ESmsPOMqqf5NqThB_uC4qeUBWLu8O35pg9zTWvuIV_tQig?e=BSjwQL). Extract the 'weights' folder and put it under ~/scripts forder.
-
-2. change directory to 'scripts', open and run detector_test.ipynb
+change directory to 'scripts', 
+```
+cd scripts/
+jupyter notebook
+```
+open and run detector_test.ipynb from the browser
 
 ## Train the network
 1. [Download the sample dataset here](https://anu365-my.sharepoint.com/:u:/g/personal/u5240496_anu_edu_au/Ec3PqU60nk5Amcfznr25XpMBthefcgvu6cqG340p8cDYFQ?e=HKRQ53). Extract the file.
@@ -21,12 +26,9 @@ Dependencies
 2. Run:
     ```
     $ cd <path_to_folder>/scripts
-    $ python python main.py --dataset_dir <full_path_to_dataset> --output_folder <folder to save the weights>
+    $ python main.py --dataset_dir <full_path_to_dataset> --output_folder <folder to save the weights>
     ```
 3. Run `python main.py -h` to get a list of configuratble parameters, including network hyper-parameters
-
-## Training Data 
-[TODO:] add instructions of running the dataset generator 
 
 
 ## Network Architecture:
