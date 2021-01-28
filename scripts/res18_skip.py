@@ -25,28 +25,27 @@ class Resnet18Skip(nn.Module):
             pre_trained_backbone.children())[-3:-2])
 
         self.top_conv = nn.Sequential(
-            nn.Conv2d(512, 128, 3, 1, 1),
+            nn.Conv2d(in_channels=512, out_channels=128, kernel_size=1),
             nn.ReLU())
         
         self.lateral_conv1 = nn.Sequential(
-            nn.Conv2d(256, 128, 3, 1, 1),
+            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=1),
             nn.ReLU())
         
         self.lateral_conv2 = nn.Sequential(
-            nn.Conv2d(128, 128, 3, 1, 1),
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=1),
             nn.ReLU())
 
         self.lateral_conv3 = nn.Sequential(
-            nn.Conv2d(64, 128, 3, 1, 1),
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=1),
             nn.ReLU())
         
         # backgound is automatically considered as one additional class,
         # with label '0'
-        self.seg_conv = nn.Sequential(
-            nn.UpsamplingBilinear2d(scale_factor=2),
-            nn.Conv2d(128, 64, 3, 1, 1),
+        self.segmentation_conv = nn.Sequential(
+            nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(64, self.args.n_classes + 1, kernel_size=1, bias=True)
+            nn.Conv2d(64, self.args.n_classes + 1, kernel_size=1)
         )
         
         self.criterion = CrossEntropyLoss()
@@ -72,8 +71,8 @@ class Resnet18Skip(nn.Module):
         p4 = self.upsample_add(p5, self.lateral_conv1(c4)) # 12 x 16
         p3 = self.upsample_add(p4, self.lateral_conv2(c3)) # 24 x 32
         p2 = self.upsample_add(p3, self.lateral_conv3(c2)) # 48 x 64
-        out = nn.ReLU()(p2)
-        out = self.seg_conv(out)
+        out = nn.UpsamplingBilinear2d(scale_factor=2)(p2)
+        out = self.segmentation_conv(out)
         return out
 
     def step(self, batch):
