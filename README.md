@@ -33,7 +33,8 @@ open and run detector_test.ipynb from the browser
 
 ## Network Architecture:
 ![Network Architecture](readme_pics/rvss_arch.png)
-*Illustration of the network architecture*
+*Illustration of the network architecture, 
+notations (c1, c2, ect. corresponds to the variable name in res18_skip.py script)*
 
 The network has a auto-encoder, decoder structure.
 ResNet18 with pre-trained weights is used as the auto-encoder. 

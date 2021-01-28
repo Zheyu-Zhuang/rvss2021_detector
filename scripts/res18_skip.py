@@ -11,42 +11,43 @@ class Resnet18Skip(nn.Module):
         self.args = args
         super(Resnet18Skip, self).__init__()
         # Load pre-trained lyrn_backend
-        pre_trained_backbone = models.resnet18(pretrained=False)
+        res18 = models.resnet18(pretrained=False)
         # with torch.no_grad():
-        self.resnet_backbone = nn.Sequential(*list(
-            pre_trained_backbone.children())[:-6])
-        self.conv2_x = nn.Sequential(*list(
-            pre_trained_backbone.children())[-6:-5])
-        self.conv3_x = nn.Sequential(*list(
-            pre_trained_backbone.children())[-5:-4])
-        self.conv4_x = nn.Sequential(*list(
-            pre_trained_backbone.children())[-4:-3])
-        self.conv5_x = nn.Sequential(*list(
-            pre_trained_backbone.children())[-3:-2])
+        print(res18)
+        self.resnet_backbone = nn.Sequential(*list(res18.children())[:-6])
+        self.conv2_x = nn.Sequential(*list(res18.children())[-6:-5])
+        self.conv3_x = nn.Sequential(*list(res18.children())[-5:-4])
+        self.conv4_x = nn.Sequential(*list(res18.children())[-4:-3])
+        self.conv5_x = nn.Sequential(*list(res18.children())[-3:-2])
 
         self.top_conv = nn.Sequential(
-            nn.Conv2d(512, 128, 3, 1, 1),
+            # 
+            nn.Conv2d(512, 128, 1),
             nn.ReLU())
         
         self.lateral_conv1 = nn.Sequential(
-            nn.Conv2d(256, 128, 3, 1, 1),
+            nn.Conv2d(256, 128, 1),
             nn.ReLU())
         
         self.lateral_conv2 = nn.Sequential(
-            nn.Conv2d(128, 128, 3, 1, 1),
+            nn.Conv2d(128, 128, 1),
             nn.ReLU())
 
         self.lateral_conv3 = nn.Sequential(
-            nn.Conv2d(64, 128, 3, 1, 1),
+            nn.Conv2d(64, 128, 1),
             nn.ReLU())
-        
+
+
+        def upsample_add(self, low_res_map, high_res_map):
+            upsampled_map = nn.UpsamplingBilinear2d(scale_factor=2)(low_res_map)
+            return upsampled_map + high_res_map
+
         # backgound is automatically considered as one additional class,
         # with label '0'
         self.seg_conv = nn.Sequential(
-            nn.UpsamplingBilinear2d(scale_factor=2),
-            nn.Conv2d(128, 64, 3, 1, 1),
+            nn.Conv2d(128, 64, kernel_size=3, stride=1, pad=1),
             nn.ReLU(),
-            nn.Conv2d(64, self.args.n_classes + 1, kernel_size=1, bias=True)
+            nn.Conv2d(64, self.args.n_classes + 1, kernel_size=1)
         )
         
         self.criterion = CrossEntropyLoss()
@@ -56,9 +57,6 @@ class Resnet18Skip(nn.Module):
             self.optimiser, gamma=self.args.scheduler_gamma,
             step_size=self.args.scheduler_step)
 
-    def upsample_add(self, low_res_map, high_res_map):
-        upsampled_map = nn.UpsamplingBilinear2d(scale_factor=2)(low_res_map)
-        return upsampled_map + high_res_map
         
     def forward(self, img):
         # Encoder
