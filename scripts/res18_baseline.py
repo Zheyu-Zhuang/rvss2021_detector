@@ -39,19 +39,24 @@ class Res18Baseline(nn.Module):
         
         # Define loss function here
         self.criterion = self.get_criterion()
-        
-    def forward(self, img):
-        # Encoder
-        c1 = self.res18_backbone(img)
-        c2 = self.conv2_x(c1) # feature map spaticl dim 48 x 64
-        c3 = self.conv3_x(c2) # feature map spaticl dim 24 x 32
-        c4 = self.conv4_x(c3) # feature map spaticl dim 12 x 16
-        c5 = self.conv5_x(c4) # feature map spaticl dim 6 x 8
-        # Decoder
-        out = self.top_conv(c5)
-        out = nn.UpsamplingBilinear2d(scale_factor=16)(out)
-        out = self.segmentation_conv(out)
-        return out
+
+    # ################################################################### 
+    # def forward(self, img):
+    #     # Encoder
+    #     c1 = self.res18_backbone(img)
+    #     c2 =                             # feature map spaticl dim 48 x 64
+    #     c3 =                             # feature map spaticl dim 24 x 32
+    #     c4 =                             # feature map spaticl dim 12 x 16
+    #     c5 =                             # feature map spaticl dim 6 x 8
+    #     # Decoder
+    #     # Channel dimension reduction
+    #     out = 
+    #     # 16 up sampling
+    #     out = 
+    #     # segmentation conv
+    #     out = 
+    #     return out
+    # ###################################################################
 
     # Define loss function here:
     def get_criterion(self):
