@@ -26,7 +26,7 @@ class Trainer:
             raise Exception('Output Destination cannot be empty !!!')
         os.makedirs(self.args.model_dir, exist_ok=True)
 
-    def fit(self, model, train_loader, eval_loader):
+    def fit(self, model, train_loader, eval_loader, test_loader):
         model = model.to(self.device)
         optimiser = model.get_optimiser()
         lr_scheduler = model.get_lr_scheduler(optimiser)
@@ -80,6 +80,9 @@ class Trainer:
                 f'\n=> Training Loss: {avg_train_loss:.4f} , ' + \
                 f'Evaluation Loss {loss_eval:.4f}')
             self.save_ckpt(model, optimiser, lr_scheduler)
+        cmd_printer.divider(text='Evaluating on the Test Dataset')
+        self.evaluate(model, test_loader)
+
 
     def evaluate(self, model, eval_loader):
         model = model.eval()

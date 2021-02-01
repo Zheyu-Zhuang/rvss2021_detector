@@ -2,10 +2,10 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_classes", metavar='', type=int, default=4)
+parser.add_argument("--n_classes", metavar='', type=int, default=2)
 parser.add_argument("--lr", metavar='', type=float, default=1.0e-3)
-parser.add_argument("--epochs", metavar='', type=int, default=40)
-parser.add_argument("--batch_size", metavar='', type=int, default=64)
+parser.add_argument("--epochs", metavar='', type=int, default=20)
+parser.add_argument("--batch_size", metavar='', type=int, default=32)
 parser.add_argument("--weight_decay", metavar='', type=float, default=1.0e-4)
 parser.add_argument("--scheduler_step", metavar='', type=int, default=5,
         help='the learning rate is reduced to <?>')
@@ -14,9 +14,11 @@ parser.add_argument("--scheduler_gamma", metavar='', type=float, default=0.5,
 # Trainer Configuration
 parser.add_argument("--model_dir", metavar='', type=str, default="",
                     help="folder to save the experiment")
+parser.add_argument("--model", metavar='', type=str, default="res18_baseline",
+                    help="specify network architecture here")
 parser.add_argument("--load_best", metavar='', type=int, default=0, 
     help=' load the best checkpoint')
-parser.add_argument("--log_freq", metavar='', type=int, default=20,
+parser.add_argument("--log_freq", metavar='', type=int, default=10,
                     help=" record a training log every <?> mini-batches")
 parser.add_argument('--dataset_dir', metavar='', type=str, default="")
 

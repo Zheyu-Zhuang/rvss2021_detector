@@ -44,7 +44,7 @@ class IMDB(Dataset):
         if not hasattr(self, 'dataset'):
             self.dataset = h5py.File(self.catalog_path, 'r')
         image = Image.open(io.BytesIO(self.dataset['images'][idx]))
-        width, height = 256, 192
+        width, height = 256, 256
         image = image.resize((width, height))
         label = Image.open(io.BytesIO(self.dataset['labels'][idx]))
         reduction = 2
@@ -56,7 +56,9 @@ class IMDB(Dataset):
             label = TF.rotate(label, angle)
         if self.transform:
             image = self.transform(image)
-        return image, np.array(label).astype(np.long)
+        label = np.array(label)
+        label = np.argmax(label, axis=2)
+        return image, label.astype(np.long)
 
 
 def imdb_loader(args):
@@ -64,7 +66,12 @@ def imdb_loader(args):
                               batch_size=args.batch_size, shuffle=True,
                               num_workers=4, drop_last=True)
 
-    eval_loader = DataLoader(dataset=IMDB(args.dataset_dir, mode='eval'),
+    eval_loader = DataLoader(dataset=IMDB(args.dataset_dir, mode='validation'),
                              batch_size=args.batch_size, shuffle=False,
                              num_workers=4, drop_last=False)
-    return train_loader, eval_loader
+
+    test_loader = DataLoader(dataset=IMDB(args.dataset_dir, mode='test'),
+                             batch_size=args.batch_size, shuffle=False,
+                             num_workers=4, drop_last=False)
+
+    return train_loader, eval_loader, test_loader

@@ -5,14 +5,19 @@ import cmd_printer
 import numpy as np
 import torch
 from args import args
-from res18_skip import Resnet18Skip
+from res18_baseline import Res18Baseline
+from res18_skip import Res18Skip
 from torchvision import transforms
 import cv2
 
 class Detector:
-    def __init__(self, ckpt, use_gpu=False):
+    def __init__(self, ckpt, use_gpu=False, model='res18_baseline'):
         self.args = args
-        self.model = Resnet18Skip(args)
+        if model == 'res18_baseline':
+            self.model = Res18Baseline(args)
+        elif model == 'res18_skip':
+            self.model = Res18Skip(args)
+        # self.model = Res18Baseline(args)
         if torch.cuda.torch.cuda.device_count() > 0 and use_gpu:
             self.use_gpu = True
             self.model = self.model.cuda()
@@ -24,7 +29,8 @@ class Detector:
         print('This detector uses "RGB" input convention by default')
         print('If you are using Opencv, the image is likely to be in "BRG"!!!')
         cmd_printer.divider()
-        self.colour_code = np.array([(220, 220, 220), (128, 0, 0), (0, 128, 0),
+        # color in bgr order
+        self.colour_code = np.array([(255, 0, 0), (0, 255, 0), (0, 0, 255),
                                     (128, 128, 0), (0, 0, 128), (128, 0, 128),
                                     (0, 128, 128), (128, 128, 128), (64, 0, 0),
                                     (192, 0, 0), (64, 128, 0), (192, 128, 0)])
@@ -53,21 +59,23 @@ class Detector:
             r[idx] = self.colour_code[class_idx, 0]
             g[idx] = self.colour_code[class_idx, 1]
             b[idx] = self.colour_code[class_idx, 2]
-        colour_map = np.stack([r, g, b], axis=2)
-        colour_map = cv2.resize(colour_map, (320, 240), cv2.INTER_NEAREST)
+        colour_map = np.stack([b, g, r], axis=2)
+        colour_map = cv2.resize(colour_map, (256, 256), cv2.INTER_NEAREST)
         w, h = 10, 10
-        pt = (10, 160)
+        pt = (10, 200)
         pad = 5
-        labels = ['apple', 'banana', 'pear', 'lemon']
+        labels = ['hair', 'face', 'bg']
         font = cv2.FONT_HERSHEY_SIMPLEX 
-        for i in range(1, self.args.n_classes + 1):
+        for i in range(0, self.args.n_classes + 1):
             c = self.colour_code[i]
             colour_map = cv2.rectangle(colour_map, pt, (pt[0]+w, pt[1]+h),
-                            (int(c[0]), int(c[1]), int(c[2])), thickness=-1)
-            colour_map  = cv2.putText(colour_map, labels[i-1],
-            (pt[0]+w+pad, pt[1]+h-1), font, 0.4, (0, 0, 0))
+                            (int(c[2]), int(c[1]), int(c[0])), thickness=-1)
+            colour_map = cv2.rectangle(colour_map, pt, (pt[0]+w, pt[1]+h),
+                            (200, 200, 200), thickness=1)
+            colour_map  = cv2.putText(colour_map, labels[i],
+            (pt[0]+w+pad, pt[1]+h-1), font, 0.4, (200, 200, 200))
             pt = (pt[0], pt[1]+h+pad)
-        return colour_map
+        return colour_map[..., ::-1]
 
     def load_weights(self, ckpt_path):
         ckpt_exists = os.path.exists(ckpt_path)
@@ -79,7 +87,7 @@ class Detector:
             print(f'checkpoint not found, weights are randomly initialised')
             
     @staticmethod
-    def np_img2torch(np_img, use_gpu=False, _size=(192, 256)):
+    def np_img2torch(np_img, use_gpu=False, _size=(256, 256)):
         preprocess = transforms.Compose([transforms.ToPILImage(),
                                          transforms.Resize(size=_size),
                                         # transforms.ColorJitter(brightness=0.4, contrast=0.3,

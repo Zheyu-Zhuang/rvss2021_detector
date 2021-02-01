@@ -6,10 +6,10 @@ from torchvision import models
 from torchvision.models.resnet import model_urls
 
 
-class Resnet18Skip(nn.Module):
+class Res18Skip(nn.Module):
     def __init__(self, args):
         self.args = args
-        super(Resnet18Skip, self).__init__()
+        super(Res18Skip, self).__init__()
         res18 = models.resnet18(pretrained=False)
         self.res18_backbone = nn.Sequential(*list(
             res18.children())[:-6])
