@@ -15,9 +15,9 @@ if __name__ == '__main__':
         print(f"   {arg}: {getattr(args, arg)}")
     cmd_printer.divider(line_max=60)
     train_loader, eval_loader, test_loader = imdb_loader(args)
-    if model == 'res18_baseline':
+    if args.model == 'res18_baseline':
         model = Res18Baseline(args)
-    elif model == 'res18_skip':
+    elif args.model == 'res18_skip':
         model = Res18Skip(args)
     trainer = Trainer(args)
     trainer.fit(model, train_loader, eval_loader, test_loader)

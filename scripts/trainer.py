@@ -18,8 +18,7 @@ class Trainer:
         self.loss_reduction = 0
         self.last_epoch = -1
         self.current_epoch = None
-        self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
         print(f'\n=> The device is using {torch.cuda.device_count()} GPU(s).')
         #
         if self.args.model_dir == '':

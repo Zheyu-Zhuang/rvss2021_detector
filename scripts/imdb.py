@@ -58,7 +58,7 @@ class IMDB(Dataset):
             image = self.transform(image)
         label = np.array(label)
         label = np.argmax(label, axis=2)
-        return image, label.astype(np.long)
+        return image, label
 
 
 def imdb_loader(args):
